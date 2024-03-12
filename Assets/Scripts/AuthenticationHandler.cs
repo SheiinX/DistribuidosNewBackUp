@@ -41,6 +41,7 @@ public class AuthenticationHandler : MonoBehaviour
         else
         {
             Username = PlayerPrefs.GetString("username");
+            Debug.Log(Username);
             StartCoroutine("GetProfile");
         }
     }
@@ -63,6 +64,20 @@ public class AuthenticationHandler : MonoBehaviour
         data.password = GameObject.Find("InputFieldPassword").GetComponent<TMP_InputField>().text;
 
         StartCoroutine("Login", JsonUtility.ToJson(data));
+    }
+
+    public void SendLogOut()
+    {
+        Token = "";
+        Username = "";
+
+        PlayerPrefs.SetString("token", Token);
+        PlayerPrefs.SetString("username", Username);
+
+        tetrisGamePanel.SetActive(false);
+        panelControl.SetActive(true);
+
+        Debug.Log("Pulsado y expulsado");
     }
 
     IEnumerator Register(string json)
@@ -115,7 +130,7 @@ public class AuthenticationHandler : MonoBehaviour
                 AuthenticationData data = JsonUtility.FromJson<AuthenticationData>(request.downloadHandler.text);
 
                 Token = data.token;
-                Username = data.user.username;
+                Username = data.usuario.username;
                 //Score = data.user.data.score;
 
                 PlayerPrefs.SetString("token", Token);
@@ -144,7 +159,7 @@ public class AuthenticationHandler : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Get(url + "/api/usuarios/" + Username);
         Debug.Log("Sending request GetProfile");
         request.SetRequestHeader("x-token", Token);
-
+        Debug.Log(url + "/api/usuarios/" + Username);
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
@@ -153,23 +168,23 @@ public class AuthenticationHandler : MonoBehaviour
         }
         else
         {
-            //Debug.Log(request.downloadHandler.text);
+            Debug.Log(request.downloadHandler.text);
 
             if (request.responseCode == 200)
             {
                 AuthenticationData data = JsonUtility.FromJson<AuthenticationData>(request.downloadHandler.text);
 
-                Debug.Log($"User{data.username} is authenticated");
-                Debug.Log($"User{data.user.username} is authenticated and their score is {data.user.data.score}");
-                //GameObject.Find("Panel").SetActive(false);
+                Debug.Log($"User{data.usuario.username} is authenticated");
+                panelControl.SetActive(false);
+                tetrisGamePanel.SetActive(true);
 
-                playerName.text = data.user.username;
-                scorePlayer.text = data.user.data.score.ToString();
-
+                playerName.text = data.usuario.username;
+                scorePlayer.text = data.usuario.data.score.ToString();
+                /*
                 JsonUser[] users = new JsonUser[10];
 
                 JsonUser[] organizedUser = users.OrderByDescending(user => user.data.score).ToArray();
-                //users.Where(user => user._id == "12345").ToList();
+                //users.Where(user => user._id == "12345").ToList();*/
             }
             else
             {
@@ -178,12 +193,13 @@ public class AuthenticationHandler : MonoBehaviour
         }
     }
 }
+
 [System.Serializable]
 public class AuthenticationData
 {
     public string username;
     public string password;
-    public JsonUser user;
+    public JsonUser usuario;
     public string token;
 }
 
