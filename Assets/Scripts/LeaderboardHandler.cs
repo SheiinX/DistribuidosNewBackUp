@@ -17,6 +17,7 @@ public class LeaderboardHandler : MonoBehaviour
 
     private List<GameObject> leaderboardItems;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +29,8 @@ public class LeaderboardHandler : MonoBehaviour
     {
         StartCoroutine("GetLeaderboard");
     }
+
+    
 
     IEnumerator GetLeaderboard()
     {

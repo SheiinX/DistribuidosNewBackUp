@@ -22,7 +22,7 @@ public class Board : MonoBehaviour
     public int scoreLine3 = 500;
     public int scoreLine4 = 800;
     
-    private int currentScore = 0;
+    public int currentScore = 0;
     
     private int numberOfLine = 0;
         

@@ -15,6 +15,8 @@ public class AuthenticationHandler : MonoBehaviour
 
     public string Username { get; private set; }
 
+    public int Score { get; private set; }
+
     private LeaderboardHandler leaderboard;
 
     //public int Score { get; private set; }
@@ -23,9 +25,18 @@ public class AuthenticationHandler : MonoBehaviour
     [SerializeField] GameObject tetrisGamePanel;
 
     [SerializeField] TextMeshPro playerName;
-    [SerializeField] TextMeshPro scorePlayer;
+    [SerializeField] TextMeshProUGUI scorePlayer;
 
     [SerializeField] TextMeshProUGUI tokenInformation;
+
+    [SerializeField] GameObject logOutButton;
+
+    [SerializeField] Board boardInformation;
+
+    [SerializeField] GameObject yesButton;
+    [SerializeField] GameObject textScore;
+
+    private int userScore;
 
     void Start()
     {
@@ -44,6 +55,16 @@ public class AuthenticationHandler : MonoBehaviour
             Debug.Log(Username);
             StartCoroutine("GetProfile");
         }
+    }
+
+    private void Update()
+    {
+        ScoreReceiver();
+    }
+
+    public void ScoreReceiver()
+    {
+        userScore = boardInformation.currentScore;
     }
 
     public void SendRegister()
@@ -75,9 +96,60 @@ public class AuthenticationHandler : MonoBehaviour
         PlayerPrefs.SetString("username", Username);
 
         tetrisGamePanel.SetActive(false);
+        textScore.SetActive(false);
+        yesButton.SetActive(false);
         panelControl.SetActive(true);
+        logOutButton.SetActive(false);
 
         Debug.Log("Pulsado y expulsado");
+    }
+
+    public void SendScore()
+    {
+        JsonUser data = new JsonUser();
+
+        data.data = new DataUser();
+        data.data.score = userScore;
+
+        Score = data.data.score;
+        PlayerPrefs.SetInt("score", Score);
+
+        scorePlayer.text = Score.ToString();
+
+        StartCoroutine("UpdateScore", JsonUtility.ToJson(data));
+    }
+
+    IEnumerator UpdateScore(string json)
+    {
+        UnityWebRequest request = UnityWebRequest.Put(url + "/api/usuarios/", json);
+        request.method = "PATCH";
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("x-token", Token);
+        
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.Log(request.error);
+        }
+        else
+        {
+            Debug.Log(request.downloadHandler.text);
+
+            if (request.responseCode == 200)
+            {
+                AuthenticationData data = JsonUtility.FromJson<AuthenticationData>(request.downloadHandler.text);
+
+                /*data.usuario.data.score = userScore;*/
+
+                Debug.Log($"New user score is {data.usuario.data.score}");
+            }
+            else
+            {
+                Debug.Log(request.responseCode + "|" + request.error);
+            }
+        }
     }
 
     IEnumerator Register(string json)
@@ -138,14 +210,16 @@ public class AuthenticationHandler : MonoBehaviour
 
                 panelControl.SetActive(false);
                 tetrisGamePanel.SetActive(true);
+                logOutButton.SetActive(true);
+
+                textScore.SetActive(true);
+                yesButton.SetActive(true);
 
                 leaderboard.TakeLeaderboard();
 
                 playerName.text = Username;
 
                 Debug.Log(data.token);
-
-                tokenInformation.text = request.downloadHandler.text;
             }
             else
             {
@@ -177,9 +251,13 @@ public class AuthenticationHandler : MonoBehaviour
                 Debug.Log($"User{data.usuario.username} is authenticated");
                 panelControl.SetActive(false);
                 tetrisGamePanel.SetActive(true);
+                logOutButton.SetActive(true);
+
+                textScore.SetActive(true);
+                yesButton.SetActive(true);
 
                 playerName.text = data.usuario.username;
-                scorePlayer.text = data.usuario.data.score.ToString();
+                scorePlayer.text = PlayerPrefs.GetInt("score").ToString();
                 /*
                 JsonUser[] users = new JsonUser[10];
 
