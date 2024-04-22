@@ -36,6 +36,8 @@ public class AuthenticationHandler : MonoBehaviour
     [SerializeField] GameObject yesButton;
     [SerializeField] GameObject textScore;
 
+    private AuthenticationData data;
+
     private int userScore;
 
     void Start()
@@ -69,7 +71,7 @@ public class AuthenticationHandler : MonoBehaviour
 
     public void SendRegister()
     {
-        AuthenticationData data = new AuthenticationData();
+        /*AuthenticationData*/ data = new AuthenticationData();
 
         data.username = GameObject.Find("InputFieldUsername").GetComponent<TMP_InputField>().text;
         data.password = GameObject.Find("InputFieldPassword").GetComponent<TMP_InputField>().text;
@@ -79,7 +81,7 @@ public class AuthenticationHandler : MonoBehaviour
 
     public void SendLogin()
     {
-        AuthenticationData data = new AuthenticationData();
+        /*AuthenticationData*/ data = new AuthenticationData();
 
         data.username = GameObject.Find("InputFieldUsername").GetComponent<TMP_InputField>().text;
         data.password = GameObject.Find("InputFieldPassword").GetComponent<TMP_InputField>().text;
@@ -110,11 +112,21 @@ public class AuthenticationHandler : MonoBehaviour
 
         data.data = new DataUser();
         data.data.score = userScore;
+        /*
+        data.usuario = new JsonUser();
+        data.usuario.data = new DataUser();
+        data.usuario.data.score = userScore;*/
+
+
+        //data.username = this.data.usuario.username;
 
         Score = data.data.score;
         PlayerPrefs.SetInt("score", Score);
 
-        scorePlayer.text = Score.ToString();
+        //scorePlayer.text = Score.ToString();
+        scorePlayer.text = data.data.score.ToString();
+
+        Debug.Log($"The actual score is {data.data.score}");
 
         StartCoroutine("UpdateScore", JsonUtility.ToJson(data));
     }
@@ -140,8 +152,6 @@ public class AuthenticationHandler : MonoBehaviour
             if (request.responseCode == 200)
             {
                 AuthenticationData data = JsonUtility.FromJson<AuthenticationData>(request.downloadHandler.text);
-
-                /*data.usuario.data.score = userScore;*/
 
                 Debug.Log($"New user score is {data.usuario.data.score}");
             }
@@ -257,12 +267,7 @@ public class AuthenticationHandler : MonoBehaviour
                 yesButton.SetActive(true);
 
                 playerName.text = data.usuario.username;
-                scorePlayer.text = PlayerPrefs.GetInt("score").ToString();
-                /*
-                JsonUser[] users = new JsonUser[10];
-
-                JsonUser[] organizedUser = users.OrderByDescending(user => user.data.score).ToArray();
-                //users.Where(user => user._id == "12345").ToList();*/
+                scorePlayer.text = data.usuario.data.score.ToString();
             }
             else
             {

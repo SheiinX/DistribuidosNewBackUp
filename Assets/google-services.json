@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "859458478694",
+    "firebase_url": "https://distriassignment-sf-default-rtdb.firebaseio.com",
+    "project_id": "distriassignment-sf",
+    "storage_bucket": "distriassignment-sf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859458478694:android:cbc06aa6856b667d1a03a7",
+        "android_client_info": {
+          "package_name": "com.upb.distriassigment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_L8GftqqwuxzQu_YSTwzjHSAsUPzKPDY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
