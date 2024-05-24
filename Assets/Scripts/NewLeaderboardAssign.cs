@@ -43,7 +43,7 @@ public class NewLeaderboardAssign : MonoBehaviour
 
             var scoreEntryGO = GameObject.Instantiate(scoreEntryPrefab, transform);
             scoreEntryGO.transform.position = new Vector2(scoreEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
-            scoreEntryGO.GetComponent<ScoreEntry>().SetLabels($"{userObject["username"]}", $"{userObject["score"]}");
+            scoreEntryGO.GetComponent<RequestEntry>().SetLabels($"{userObject["username"]}");
 
             i++;
         }
