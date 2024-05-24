@@ -8,6 +8,8 @@ public class RequestEntry : MonoBehaviour
     [SerializeField]
     private TMP_Text _labelUsername;
 
+    
+
     public void SetLabels(string username)
     {
         _labelUsername.text = username;
