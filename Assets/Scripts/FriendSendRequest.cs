@@ -16,6 +16,7 @@ public class FriendSendRequest : MonoBehaviour
 
     private DatabaseReference _mDatabaseRef;
     private FirebaseAuth _auth;
+    private RequestEntry requestUser;
 
     private void Awake()
     {
@@ -27,7 +28,7 @@ public class FriendSendRequest : MonoBehaviour
         _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
         _auth = FirebaseAuth.DefaultInstance;
 
-        _sendRequestButton.onClick.AddListener(() => SendFriendRequest("friendId_example"));
+        _sendRequestButton.onClick.AddListener(() => SendFriendRequest(requestUser._Uid));
     }
 
     private void SendFriendRequest(string friendId)

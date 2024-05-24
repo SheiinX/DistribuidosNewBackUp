@@ -15,11 +15,11 @@ public class UsersOnline : MonoBehaviour // Changed class name to reflect functi
     // Start is called before the first frame update
     void Start()
     {
-        FirebaseDatabase.DefaultInstance.GetReference("users").LimitToLast(3).ValueChanged += HandleValueChanged;
+        //FirebaseDatabase.DefaultInstance.GetReference("users").LimitToLast(3).ValueChanged += HandleValueChanged;
         GetUsersOnline();
     }
 
-    private void HandleValueChanged(object sender, ValueChangedEventArgs args)
+    /*private void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)
         {
@@ -49,7 +49,7 @@ public class UsersOnline : MonoBehaviour // Changed class name to reflect functi
 
             i++;
         }
-    }
+    }*/
 
     private void GetUsersOnline()
     {
@@ -69,13 +69,14 @@ public class UsersOnline : MonoBehaviour // Changed class name to reflect functi
                 foreach (var userDoc in (Dictionary<string, object>)snapshot.Value)
                 {
                     var userObject = (Dictionary<string, object>)userDoc.Value;
+                    string userId = snapshot.Key;
                     string username = userObject["username"].ToString(); // Assuming username exists
 
                     Debug.Log(username);
 
                     var connectionEntryGO = GameObject.Instantiate(connectionEntryPrefab, transform);
                     connectionEntryGO.transform.position = new Vector2(connectionEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
-                    connectionEntryGO.GetComponent<RequestEntry>().SetLabels(username); // Assuming ConnectionEntry has a SetLabel method for username only
+                    connectionEntryGO.GetComponent<RequestEntry>().SetLabels(username, userId); // Assuming ConnectionEntry has a SetLabel method for username only
 
                     i++;
                 }

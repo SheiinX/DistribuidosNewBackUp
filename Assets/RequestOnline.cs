@@ -70,11 +70,12 @@ public class RequestOnline : MonoBehaviour
                         {
                             // Extract username (assuming it exists)
                             string username = userSnapshot.Child("username").Value.ToString();
+                            string userId = snapshot.Key;
 
                             // Create entry for the user
                             var connectionEntryGO = GameObject.Instantiate(connectionEntryPrefab, transform);
                             connectionEntryGO.transform.position = new Vector2(connectionEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
-                            connectionEntryGO.GetComponent<RequestEntry>().SetLabels(username); // Assuming SetLabels takes username
+                            connectionEntryGO.GetComponent<RequestEntry>().SetLabels(username, userId); // Assuming SetLabels takes username
 
                             i++;
                         }

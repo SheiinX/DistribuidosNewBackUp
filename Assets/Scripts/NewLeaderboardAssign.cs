@@ -39,11 +39,12 @@ public class NewLeaderboardAssign : MonoBehaviour
         foreach (var userDoc in (Dictionary<string, object>)snapshot.Value)
         {
             var userObject = (Dictionary<string, object>)userDoc.Value;
+            string userId = snapshot.Key;
             Debug.Log($"{userObject["username"]} : {userObject["score"]}");
 
             var scoreEntryGO = GameObject.Instantiate(scoreEntryPrefab, transform);
             scoreEntryGO.transform.position = new Vector2(scoreEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
-            scoreEntryGO.GetComponent<RequestEntry>().SetLabels($"{userObject["username"]}");
+            scoreEntryGO.GetComponent<RequestEntry>().SetLabels($"{userObject["username"]}", userId);
 
             i++;
         }
