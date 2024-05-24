@@ -70,6 +70,7 @@ public class UsersOnline : MonoBehaviour // Changed class name to reflect functi
                 {
                     var userObject = (Dictionary<string, object>)userDoc.Value;
                     string userId = snapshot.Key;
+                    Debug.Log($"User id of this {i} is {userId}");
                     string username = userObject["username"].ToString(); // Assuming username exists
 
                     Debug.Log(username);
