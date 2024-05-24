@@ -16,7 +16,7 @@ public class NewLeaderboardAssign : MonoBehaviour
     void Start()
     {
         FirebaseDatabase.DefaultInstance.GetReference("users").OrderByChild("score").LimitToLast(3).ValueChanged += HandleValueChanged;
-        //GetUsersHighestScores();
+        GetUsersHighestScores();
     }
 
     private void HandleValueChanged(object sender, ValueChangedEventArgs args)
