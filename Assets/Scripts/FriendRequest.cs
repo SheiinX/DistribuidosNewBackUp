@@ -47,6 +47,8 @@ public class FriendRequest : MonoBehaviour
     private void AcceptFriend()
     {
         // Agregar el amigo a la lista de amigos del usuario actual
+        Debug.Log($"{_friendId}");
+        Debug.Log($"{_friendName}");
         AddFriend(_friendId, _friendName);
     }
 
