@@ -44,6 +44,8 @@ public class AuthenticationHandler : MonoBehaviour
     {
         leaderboard = GetComponent<LeaderboardHandler>();
 
+        data.usuario.data.isConected = false;
+
         Token = PlayerPrefs.GetString("token");
 
         if (string.IsNullOrEmpty(Token))
@@ -62,6 +64,7 @@ public class AuthenticationHandler : MonoBehaviour
     private void Update()
     {
         ScoreReceiver();
+        Debug.Log(data.usuario.data.isConected);
     }
 
     public void ScoreReceiver()
