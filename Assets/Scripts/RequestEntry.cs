@@ -16,4 +16,9 @@ public class RequestEntry : MonoBehaviour
         _labelUsername.text = username;
         _uid = userId;
     }
+    
+    public string NameOfTheUser()
+    {
+        return _labelUsername.text;
+    }
 }
