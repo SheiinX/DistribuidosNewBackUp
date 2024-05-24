@@ -22,6 +22,8 @@ public class FriendRequest : MonoBehaviour
     void Start()
     {
         _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
+
+        //_acceptButton.onClick.AddListener(AcceptDeclineRequest());
     }
 
     private void AcceptDeclineRequest(string userId, string friendId, string name, string email)
