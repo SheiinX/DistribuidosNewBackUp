@@ -304,6 +304,7 @@ public class UserList
 public class DataUser
 {
     public int score;
+    public bool isConected;
 }
 
 
