@@ -39,7 +39,7 @@ public class NewLeaderboardAssign : MonoBehaviour
         foreach (var userDoc in (Dictionary<string, object>)snapshot.Value)
         {
             var userObject = (Dictionary<string, object>)userDoc.Value;
-            string userId = snapshot.Key;
+            string userId = userDoc.Key;
             Debug.Log($"{userObject["username"]} : {userObject["score"]}");
 
             var scoreEntryGO = GameObject.Instantiate(scoreEntryPrefab, transform);

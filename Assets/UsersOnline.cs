@@ -69,7 +69,7 @@ public class UsersOnline : MonoBehaviour // Changed class name to reflect functi
                 foreach (var userDoc in (Dictionary<string, object>)snapshot.Value)
                 {
                     var userObject = (Dictionary<string, object>)userDoc.Value;
-                    string userId = snapshot.Key;
+                    string userId = userDoc.Key;
                     Debug.Log($"User id of this {i} is {userId}");
                     string username = userObject["username"].ToString(); // Assuming username exists
 
