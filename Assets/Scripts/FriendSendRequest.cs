@@ -28,7 +28,7 @@ public class FriendSendRequest : MonoBehaviour
         _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
         _auth = FirebaseAuth.DefaultInstance;
 
-        _sendRequestButton.onClick.AddListener(() => SendFriendRequest(requestUser._Uid));
+        _sendRequestButton.onClick.AddListener(() => SendFriendRequest(requestUser._uid));
     }
 
     private void SendFriendRequest(string friendId)
