@@ -22,6 +22,9 @@ public class SignUpBtnScript : MonoBehaviour
 
     private DatabaseReference _mDatabaseRef;
 
+    // Use a separate variable for user connection state
+    private bool _userIsConnected = false;  // Default to disconnected
+
     private void Reset()
     {
         _signUpBtn = GetComponent<Button>();
@@ -34,6 +37,11 @@ public class SignUpBtnScript : MonoBehaviour
     {
         _signUpBtn.onClick.AddListener(HandleSignupButton);
         _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
+
+        // Check for existing user connection on app launch (optional)
+        // You can implement logic here to handle reconnection or display a message
+        // if the user was previously connected.
+        // ...
     }
 
     private void HandleSignupButton()
@@ -46,14 +54,14 @@ public class SignUpBtnScript : MonoBehaviour
         var auth = FirebaseAuth.DefaultInstance;
 
         var signUpTask = auth.CreateUserWithEmailAndPasswordAsync(_emailInputField.text, _passwordInputField.text);
-        
+
         yield return new WaitUntil(() => signUpTask.IsCompleted);
 
-        if(signUpTask.IsCanceled)
+        if (signUpTask.IsCanceled)
         {
             Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled");
         }
-        else if(signUpTask.IsFaulted)
+        else if (signUpTask.IsFaulted)
         {
             Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + signUpTask.Exception);
         }
@@ -63,6 +71,11 @@ public class SignUpBtnScript : MonoBehaviour
             Debug.LogError($"Firebase user created successfully: {result.User.DisplayName} ({result.User.UserId})");
 
             _mDatabaseRef.Child("users").Child(result.User.UserId).Child("username").SetValueAsync(_usernameInputField.text);
+
+            FirebaseDatabase.DefaultInstance.RootReference.Child(result.User.UserId).Child("isConected").SetValueAsync(_userIsConnected);
+            Debug.Log($"User connection state: {_userIsConnected}");
         }
     }
 }
+
+
