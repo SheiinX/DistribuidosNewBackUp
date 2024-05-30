@@ -24,8 +24,6 @@ public class FriendRequest : MonoBehaviour
 
     private void Awake()
     {
-        _acceptButton = GetComponent<Button>();
-        _cancelButton = GetComponent<Button>();
         requestEntry = GetComponent<RequestEntry>();
     }
 
