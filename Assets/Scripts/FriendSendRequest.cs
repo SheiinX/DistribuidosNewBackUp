@@ -103,6 +103,7 @@ public class FriendSendRequest : MonoBehaviour
             {
                 Debug.Log("Friend request sent successfully.");
                 //Destroy(gameObject);
+                Debug.Log($"{friendId}");
             }
             else
             {

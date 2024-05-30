@@ -33,8 +33,8 @@ public class FriendRequest : MonoBehaviour
         _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
         _auth = FirebaseAuth.DefaultInstance;
 
-        _friendId = requestEntry._uid;
-        _friendName = requestEntry.NameOfTheUser();
+        // Initialize the friendId and friendName
+        InitializeFriendData();
 
         _acceptButton.onClick.AddListener(AcceptFriend);
         _cancelButton.onClick.AddListener(DeclineFriend);
@@ -42,8 +42,35 @@ public class FriendRequest : MonoBehaviour
         // Obtener identificadores de usuario y amigo (desde parámetros o lógica de la aplicación)
     }
 
+    private void InitializeFriendData()
+    {
+        FirebaseUser currentUser = _auth.CurrentUser;
+        if (currentUser == null)
+        {
+            Debug.LogError("No user is authenticated.");
+            return;
+        }
+
+        _userId = currentUser.UserId;
+
+        // Assuming that requestEntry has the friend ID and friend name
+        _friendId = requestEntry._uid;
+        _friendName = requestEntry.NameOfTheUser();
+
+        if (string.IsNullOrEmpty(_friendId) || string.IsNullOrEmpty(_friendName))
+        {
+            Debug.LogError("Friend ID or name is not properly initialized.");
+        }
+    }
+
     private void AcceptFriend()
     {
+        if (string.IsNullOrEmpty(_friendId) || string.IsNullOrEmpty(_friendName))
+        {
+            Debug.LogError("Friend ID or name is not set.");
+            return;
+        }
+
         // Agregar el amigo a la lista de amigos del usuario actual
         Debug.Log($"{_friendId}");
         Debug.Log($"{_friendName}");
@@ -53,6 +80,7 @@ public class FriendRequest : MonoBehaviour
     private void DeclineFriend()
     {
         // Eliminar la solicitud de amistad (opcional)
+        RemoveFriendRequest(_friendId);
     }
 
     private void AddFriend(string friendId, string friendName)
@@ -74,6 +102,8 @@ public class FriendRequest : MonoBehaviour
             if (task.IsCompleted)
             {
                 Debug.Log("Friend added successfully.");
+                // Optionally remove the friend request
+                RemoveFriendRequest(friendId);
             }
             else
             {
@@ -82,7 +112,29 @@ public class FriendRequest : MonoBehaviour
         });
     }
 
-    
+    private void RemoveFriendRequest(string friendId)
+    {
+        FirebaseUser currentUser = _auth.CurrentUser;
+        if (currentUser == null)
+        {
+            Debug.LogError("No user is authenticated.");
+            return;
+        }
+
+        string currentUserId = currentUser.UserId;
+
+        _mDatabaseRef.Child("users").Child(currentUserId).Child("friendRequests").Child(friendId).RemoveValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("Friend request removed successfully.");
+            }
+            else
+            {
+                Debug.LogError("Failed to remove friend request: " + task.Exception);
+            }
+        });
+    }
 }
 
 [System.Serializable]
@@ -97,4 +149,6 @@ public class User
         this.uid = uid;
     }
 }
+
+
 
