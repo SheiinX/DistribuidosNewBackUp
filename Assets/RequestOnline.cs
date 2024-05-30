@@ -36,6 +36,7 @@ public class RequestOnline : MonoBehaviour
         }
 
         DataSnapshot snapshot = args.Snapshot;
+        Debug.Log("Got Snapshot");
 
         // Clear existing entries
         var connectionEntries = GetComponentsInChildren<RequestEntry>();
@@ -49,7 +50,7 @@ public class RequestOnline : MonoBehaviour
         {
             // Get user ID of the sender
             string friendId = friendRequestDoc.Key;
-
+            Debug.Log("entered foreach");
             // Get user data based on friend ID
             FirebaseDatabase.DefaultInstance.GetReference("users")
                 .Child(friendId)
@@ -65,7 +66,7 @@ public class RequestOnline : MonoBehaviour
                     if (task.IsCompleted)
                     {
                         DataSnapshot userSnapshot = task.Result;
-
+                        Debug.Log("Got user snapshot");
                         if (userSnapshot.Exists)
                         {
                             // Extract username (assuming it exists)
