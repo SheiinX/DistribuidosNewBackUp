@@ -1,3 +1,4 @@
+using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using System.Collections;
@@ -13,18 +14,35 @@ public class RequestOnline : MonoBehaviour
     private float _spacedBoard;
 
     private string _currentUserId; // Assuming you have a way to get the current user ID
+    private DatabaseReference _mDatabaseRef;
+    private FirebaseAuth _auth;
 
     // Start is called before the first frame update
     void Start()
     {
         // Get current user ID (replace with your logic)
-        _currentUserId = "your_user_id"; // Example placeholder
+        GetCurrentUserId();
 
         // Listen for changes in friend requests for the current user
         FirebaseDatabase.DefaultInstance.GetReference("users")
             .Child(_currentUserId)
             .Child("friendRequests")
             .ValueChanged += HandleFriendRequestsChanged;
+    }
+
+    private void GetCurrentUserId()
+    {
+        _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
+        _auth = FirebaseAuth.DefaultInstance;
+
+        FirebaseUser currentUser = _auth.CurrentUser;
+        if (currentUser == null)
+        {
+            Debug.LogError("No user is authenticated.");
+            return;
+        }
+
+        _currentUserId = currentUser.UserId;
     }
 
     private void HandleFriendRequestsChanged(object sender, ValueChangedEventArgs args)
@@ -38,11 +56,16 @@ public class RequestOnline : MonoBehaviour
         DataSnapshot snapshot = args.Snapshot;
         Debug.Log("Got Snapshot");
 
+        string jsonSnapshot = snapshot.GetRawJsonValue();
+        Debug.Log("Snapshot JSON: " + jsonSnapshot);
+
         // Clear existing entries
         var connectionEntries = GetComponentsInChildren<RequestEntry>();
+        Debug.Log($"Number of RequestEntry components found: {connectionEntries.Length}");
         foreach (var entry in connectionEntries)
         {
             Destroy(entry.gameObject);
+            Debug.Log("Entering Destroy function");
         }
 
         int i = 0;
