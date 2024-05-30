@@ -14,6 +14,7 @@ public class FriendsHandler : MonoBehaviour
     private float _spacedBoard;
 
     private DatabaseReference _mDatabaseRef;
+    private FirebaseAuth _auth;
     private string userId;
 
     // Start is called before the first frame update
@@ -21,10 +22,24 @@ public class FriendsHandler : MonoBehaviour
     {
         //_mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
         //FirebaseAuth user = FirebaseAuth.DefaultInstance;
-        FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
-        userId = user.UserId;
+        GetCurrentUserId();
 
-        FirebaseDatabase.DefaultInstance.GetReference(userId).OrderByChild("friends").LimitToLast(6).ValueChanged += GetFriendsList;
+        FirebaseDatabase.DefaultInstance.GetReference("users").Child(userId).Child("friends").OrderByChild("friendRequests").LimitToLast(6).ValueChanged += GetFriendsList;
+    }
+
+    private void GetCurrentUserId()
+    {
+        _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
+        _auth = FirebaseAuth.DefaultInstance;
+
+        FirebaseUser currentUser = _auth.CurrentUser;
+        if (currentUser == null)
+        {
+            Debug.LogError("No user is authenticated.");
+            return;
+        }
+
+        userId = currentUser.UserId;
     }
 
     public void GetFriendsList(object sender, ValueChangedEventArgs args)
@@ -44,7 +59,18 @@ public class FriendsHandler : MonoBehaviour
         }
 
         int i = 0;
-        foreach (var userDoc in (Dictionary<string, object>)snapshot.Value)
+        foreach (var friendRequestDoc in snapshot.Children)
+        {
+            string friendId = friendRequestDoc.Key;
+            string usernameFriend = friendRequestDoc.Child("username").Value.ToString();
+
+            var scoreEntryGO = GameObject.Instantiate(_prefabFriend, transform);
+            scoreEntryGO.transform.position = new Vector2(scoreEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
+            scoreEntryGO.GetComponent<RequestEntry>().SetLabels(usernameFriend, friendId);
+        }
+
+        /*
+            foreach (var userDoc in (Dictionary<string, object>)snapshot.Value)
         {
             var userObject = (Dictionary<string, object>)userDoc.Value;
             string userId = snapshot.Key;
@@ -54,7 +80,7 @@ public class FriendsHandler : MonoBehaviour
             scoreEntryGO.GetComponent<RequestEntry>().SetLabels($"{userObject["username"]}", userId);
 
             i++;
-        }
+        }*/
     }
 
     /*
