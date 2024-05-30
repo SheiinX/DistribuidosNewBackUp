@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Firebase.Extensions;
 
 public class FriendSendRequest : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class FriendSendRequest : MonoBehaviour
     private FirebaseAuth _auth;
     private RequestEntry requestUser;
 
+    private string usernameGot;
+    private string idGot;
+
     private void Awake()
     {
         requestUser = GetComponent<RequestEntry>();
@@ -30,10 +34,15 @@ public class FriendSendRequest : MonoBehaviour
         _auth = FirebaseAuth.DefaultInstance;
 
         //Debug.Log($"The id of the request is {requestUser._uid}");
-        _sendRequestButton.onClick.AddListener(() => SendFriendRequest(requestUser._uid));
+        _sendRequestButton.onClick.AddListener(() => BridgeToSendRequest());
     }
 
-    private void SendFriendRequest(string friendId)
+    private void BridgeToSendRequest()
+    {
+        GetCurrentUserName();
+    }
+
+    private void GetCurrentUserName()
     {
         FirebaseUser currentUser = _auth.CurrentUser;
         if (currentUser == null)
@@ -42,15 +51,58 @@ public class FriendSendRequest : MonoBehaviour
             return;
         }
 
-        string currentUserId = currentUser.UserId;
-        FriendRequestData requestData = new FriendRequestData(currentUserId, currentUser.DisplayName);
+        idGot = currentUser.UserId;
+
+        //string currentUserUsername = "";
+
+        _mDatabaseRef.Child("users").Child(idGot).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.LogError(task.Exception);
+                return;
+            }
+
+            if (task.IsCompleted)
+            {
+                DataSnapshot userSnapshot = task.Result;
+
+                if (userSnapshot.Exists)
+                {
+                    usernameGot = userSnapshot.Child("username").Value.ToString();
+                    SendFriendRequest(requestUser._uid, usernameGot, idGot);
+                    Debug.Log($"Username of the current user is {usernameGot}");
+                }
+            }
+        });
+
+        Debug.Log($"Username outside of the if is {usernameGot}");
+    }
+
+    private void SendFriendRequest(string friendId, string currentUsername, string currentId)
+    {
+
+        if (currentUsername == "")
+        {
+            Debug.Log("No username got it");
+            return;
+        }
+
+        if (currentId == "")
+        {
+            Debug.Log("No id got it");
+            return;
+        }
+
+        FriendRequestData requestData = new FriendRequestData(currentId, currentUsername);
         string json = JsonUtility.ToJson(requestData);
 
-        _mDatabaseRef.Child("users").Child(friendId).Child("friendRequests").Child(currentUserId).SetRawJsonValueAsync(json).ContinueWith(task =>
+        _mDatabaseRef.Child("users").Child(friendId).Child("friendRequests").Child(currentId).SetRawJsonValueAsync(json).ContinueWith(task =>
         {
             if (task.IsCompleted)
             {
                 Debug.Log("Friend request sent successfully.");
+                //Destroy(gameObject);
             }
             else
             {
