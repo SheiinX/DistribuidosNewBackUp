@@ -102,7 +102,7 @@ public class FriendSendRequest : MonoBehaviour
             if (task.IsCompleted)
             {
                 Debug.Log("Friend request sent successfully.");
-                //Destroy(gameObject);
+                _sendRequestButton.gameObject.SetActive(false);
                 Debug.Log($"{friendId}");
             }
             else
