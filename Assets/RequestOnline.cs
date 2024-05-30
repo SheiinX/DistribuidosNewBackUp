@@ -92,9 +92,14 @@ public class RequestOnline : MonoBehaviour
                         Debug.Log("Got user snapshot");
                         if (userSnapshot.Exists)
                         {
+                            string userJsonSnapshot = userSnapshot.GetRawJsonValue();
+                            Debug.Log("User Snapshot JSON: " + userJsonSnapshot);
+
                             // Extract username (assuming it exists)
                             string username = userSnapshot.Child("username").Value.ToString();
-                            string userId = snapshot.Key;
+                            Debug.Log($"Name of the user friend is {username}");
+                            string userId = friendId;
+                            Debug.Log($"Id of the user friend is {userId}");
 
                             // Create entry for the user
                             var connectionEntryGO = GameObject.Instantiate(connectionEntryPrefab, transform);

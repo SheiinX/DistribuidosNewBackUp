@@ -55,7 +55,9 @@ public class FriendRequest : MonoBehaviour
 
         // Assuming that requestEntry has the friend ID and friend name
         _friendId = requestEntry._uid;
+        Debug.Log($"id for accept/deny request {_friendId}");
         _friendName = requestEntry.NameOfTheUser();
+        Debug.Log($"username for accept/deny request {_friendId}");
 
         if (string.IsNullOrEmpty(_friendId) || string.IsNullOrEmpty(_friendName))
         {
