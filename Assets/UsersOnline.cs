@@ -12,6 +12,9 @@ public class UsersOnline : MonoBehaviour // Changed class name to reflect functi
     [SerializeField]
     private float _spacedBoard;
 
+    [SerializeField]
+    private int limitLastList;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -53,7 +56,7 @@ public class UsersOnline : MonoBehaviour // Changed class name to reflect functi
 
     private void GetUsersOnline()
     {
-        FirebaseDatabase.DefaultInstance.GetReference("users").LimitToLast(3).GetValueAsync()
+        FirebaseDatabase.DefaultInstance.GetReference("users").LimitToLast(limitLastList).GetValueAsync()
         .ContinueWithOnMainThread(task =>
         {
             if (task.IsFaulted)
