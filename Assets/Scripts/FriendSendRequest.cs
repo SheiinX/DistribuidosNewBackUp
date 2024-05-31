@@ -41,7 +41,6 @@ public class FriendSendRequest : MonoBehaviour
     {
         GetCurrentUserName();
     }
-
     private void GetCurrentUserName()
     {
         FirebaseUser currentUser = _auth.CurrentUser;
@@ -52,8 +51,6 @@ public class FriendSendRequest : MonoBehaviour
         }
 
         idGot = currentUser.UserId;
-
-        //string currentUserUsername = "";
 
         _mDatabaseRef.Child("users").Child(idGot).GetValueAsync().ContinueWithOnMainThread(task =>
         {
@@ -70,31 +67,31 @@ public class FriendSendRequest : MonoBehaviour
                 if (userSnapshot.Exists)
                 {
                     usernameGot = userSnapshot.Child("username").Value.ToString();
-                    SendFriendRequest(requestUser._uid, usernameGot, idGot);
+                    bool isConnected = bool.Parse(userSnapshot.Child("isConnected").Value.ToString()); // Assuming isConnected is stored as a boolean in Firebase
+
+                    SendFriendRequest(requestUser._uid, usernameGot, idGot, isConnected);
                     Debug.Log($"Username of the current user is {usernameGot}");
                 }
             }
         });
-
-        Debug.Log($"Username outside of the if is {usernameGot}");
     }
 
-    private void SendFriendRequest(string friendId, string currentUsername, string currentId)
-    {
 
+    private void SendFriendRequest(string friendId, string currentUsername, string currentId, bool isConnected)
+    {
         if (currentUsername == "")
         {
-            Debug.Log("No username got it");
+            Debug.Log("No username received.");
             return;
         }
 
         if (currentId == "")
         {
-            Debug.Log("No id got it");
+            Debug.Log("No ID received.");
             return;
         }
 
-        FriendRequestData requestData = new FriendRequestData(currentId, currentUsername);
+        FriendRequestData requestData = new FriendRequestData(currentId, currentUsername, isConnected);
         string json = JsonUtility.ToJson(requestData);
 
         _mDatabaseRef.Child("users").Child(friendId).Child("friendRequests").Child(currentId).SetRawJsonValueAsync(json).ContinueWith(task =>
@@ -111,6 +108,7 @@ public class FriendSendRequest : MonoBehaviour
             }
         });
     }
+
 }
 
 [System.Serializable]
@@ -118,10 +116,13 @@ public class FriendRequestData
 {
     public string senderId;
     public string senderName;
+    public bool isConnected;
 
-    public FriendRequestData(string senderId, string senderName)
+    public FriendRequestData(string senderId, string senderName, bool isConnected)
     {
         this.senderId = senderId;
         this.senderName = senderName;
+        this.isConnected = isConnected;
     }
 }
+

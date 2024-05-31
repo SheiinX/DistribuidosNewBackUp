@@ -20,8 +20,9 @@ public class FriendsHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //_mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
-        //FirebaseAuth user = FirebaseAuth.DefaultInstance;
+        _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
+        _auth = FirebaseAuth.DefaultInstance;
+
         GetCurrentUserId();
 
         FirebaseDatabase.DefaultInstance.GetReference("users").Child(userId).Child("friends").OrderByChild("friendRequests").LimitToLast(6).ValueChanged += GetFriendsList;
@@ -29,9 +30,6 @@ public class FriendsHandler : MonoBehaviour
 
     private void GetCurrentUserId()
     {
-        _mDatabaseRef = FirebaseDatabase.DefaultInstance.RootReference;
-        _auth = FirebaseAuth.DefaultInstance;
-
         FirebaseUser currentUser = _auth.CurrentUser;
         if (currentUser == null)
         {
@@ -52,80 +50,25 @@ public class FriendsHandler : MonoBehaviour
 
         DataSnapshot snapshot = args.Snapshot;
 
-        var _friendList = gameObject.GetComponentsInChildren<RequestEntry>();
+        // Clear existing friend entries
+        var _friendList = gameObject.GetComponentsInChildren<FriendEntry>(); // Assuming FriendEntry script on friends' GameObjects
         foreach (var item in _friendList)
         {
             Destroy(item.gameObject);
         }
 
         int i = 0;
-        foreach (var friendRequestDoc in snapshot.Children)
+        foreach (var friendSnapshot in snapshot.Children)
         {
-            string friendId = friendRequestDoc.Key;
-            string usernameFriend = friendRequestDoc.Child("username").Value.ToString();
+            string friendId = friendSnapshot.Key;
+            string usernameFriend = friendSnapshot.Child("username").Value.ToString();
+            bool isConnected = bool.Parse(friendSnapshot.Child("isConnected").Value.ToString()); // Assuming isConnected is stored as a boolean
 
-            var scoreEntryGO = GameObject.Instantiate(_prefabFriend, transform);
-            scoreEntryGO.transform.position = new Vector2(scoreEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
-            scoreEntryGO.GetComponent<RequestEntry>().SetLabels(usernameFriend, friendId);
-        }
-
-        /*
-            foreach (var userDoc in (Dictionary<string, object>)snapshot.Value)
-        {
-            var userObject = (Dictionary<string, object>)userDoc.Value;
-            string userId = snapshot.Key;
-
-            var scoreEntryGO = GameObject.Instantiate(_prefabFriend, transform);
-            scoreEntryGO.transform.position = new Vector2(scoreEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
-            scoreEntryGO.GetComponent<RequestEntry>().SetLabels($"{userObject["username"]}", userId);
+            var friendEntryGO = GameObject.Instantiate(_prefabFriend, transform);
+            friendEntryGO.transform.position = new Vector2(friendEntryGO.transform.position.x, transform.position.y - i * _spacedBoard);
+            friendEntryGO.GetComponent<FriendEntry>().SetLabels(usernameFriend, friendId, isConnected);
 
             i++;
-        }*/
+        }
     }
-
-    /*
-    public void GetFriendsList(string userId)
-    {
-        _mDatabaseRef.Child("users").Child(userId).Child("friends").GetValueAsync().ContinueWith(task =>
-        {
-            if (task.IsCompleted)
-            {
-                DataSnapshot snapshot = task.Result;
-                foreach (DataSnapshot friendSnapshot in snapshot.Children)
-                {
-                    string friendId = friendSnapshot.Key;
-                    string friendUsername = friendSnapshot.Child("username").Value.ToString();
-                    int friendScore = int.Parse(friendSnapshot.Child("score").Value.ToString());
-                    Debug.Log($"Friend ID: {friendId}, Username: {friendUsername}, Score: {friendScore}");
-                }
-            }
-            else
-            {
-                Debug.LogError("Failed to retrieve friends list: " + task.Exception);
-            }
-        });*/
-
-    /*_mDatabaseRef.Child("users").Child(userId).Child("friends").GetValueAsync().ContinueWith(task =>
-        {
-            if (task.IsCompleted)
-            {
-                DataSnapshot snapshot = task.Result;
-                int i = 0;
-                foreach (DataSnapshot friendSnapshot in snapshot.Children)
-                {
-                    string friendId = friendSnapshot.Key;
-                    string friendUsername = friendSnapshot.Child("username").Value.ToString();
-
-                    var friendEntryBoard = GameObject.Instantiate(_prefabFriend, transform);
-                    friendEntryBoard.transform.position = new Vector2(friendEntryBoard.transform.position.x, transform.position.y - i * _spacedBoard);
-                    
-                    i++;
-                }
-            }
-            else
-            {
-                Debug.LogError("Failed to retrieve friends list: " + task.Exception);
-            }
-        });
-    }*/
 }
